@@ -1,0 +1,104 @@
+body {
+    background: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.nokia-frame {
+    background: #c7c7c7;
+    padding: 20px;
+    border-radius: 20px;
+    border: 5px solid #888;
+}
+
+.screen {
+    background: #879372; /* Typická barva LCD displeje */
+    border: 10px solid #222;
+    position: relative;
+    image-rendering: pixelated;
+}
+
+#score {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: #222;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+canvas {
+    display: block;
+}
+3. JavaScript (Logika hry)
+Tento skript se stará o pohyb hada, sbírání potravy a detekci nárazů.
+
+const canvas = document.getElementById("snakeGame");
+const ctx = canvas.getContext("2d");
+const scoreElement = document.getElementById("score");
+
+const box = 10; // Velikost jednoho pixelu/čtverce
+let score = 0;
+let snake = [{ x: 10 * box, y: 10 * box }];
+let food = {
+    x: Math.floor(Math.random() * 29) * box,
+    y: Math.floor(Math.random() * 19) * box
+};
+let d = "RIGHT";
+
+document.addEventListener("keydown", direction);
+
+function direction(event) {
+    if(event.keyCode == 37 && d != "RIGHT") d = "LEFT";
+    else if(event.keyCode == 38 && d != "DOWN") d = "UP";
+    else if(event.keyCode == 39 && d != "LEFT") d = "RIGHT";
+    else if(event.keyCode == 40 && d != "UP") d = "DOWN";
+}
+
+function draw() {
+    // Pozadí displeje
+    ctx.fillStyle = "#879372";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Vykreslení hada
+    for(let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = "#222"; // Tmavé pixely
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        ctx.strokeStyle = "#879372";
+        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+    }
+
+    // Vykreslení jídla
+    ctx.fillStyle = "#222";
+    ctx.fillRect(food.x, food.y, box, box);
+
+    // Stará pozice hlavy
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+
+    // Pohyb
+    if( d == "LEFT") snakeX -= box;
+    if( d == "UP") snakeY -= box;
+    if( d == "RIGHT") snakeX += box;
+    if( d == "DOWN") snakeY += box;
+
+    // Pokud had sní jídlo
+    if(snakeX == food.x && snakeY == food.y) {
+        score++;
+        scoreElement.innerHTML = "Body: " + score;
+        food = {
+            x: Math.floor(Math.random() * 29) * box,
+            y: Math.floor(Math.random() * 19) * box
+        };
+    } else {
+        snake.pop(); // Odstraní ocas
+    }
+
+    let newHead = { x: snakeX, y: snakeY };
+
+
+
